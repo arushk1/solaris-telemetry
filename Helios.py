@@ -12,13 +12,29 @@ mgui.title("Helios Suite")
 class GUI:
 
     def __init__(self,mgui):
+        print "First Func"
+        self.creategui()
+        self.initpins()
+        while True:
+            self.updatepins()
+            self.updategui()
+            time.sleep(1)
         #Define Sensor and output  pins
         #Call display after defining
         #Put in loop of delay 1 sec to update values
 
+    def initpins(self):
 
-    
-        
+        print "Initialize pins"
+
+    def updatepins(self):
+
+        print "Update Pins"
+
+    def creategui(self):
+
+        print "Creates GUI"
+            
         #Frame Information
         frame1 = Frame(mgui,bd=4,padx=2,pady=2,relief=GROOVE,width=200,height=125)
         frame2 = Frame(mgui,bd=4,padx=2,pady=2,relief=GROOVE,width=200,height=175)
@@ -49,6 +65,10 @@ class GUI:
         #Initialise values
         #Using Random Values to test
         #Replace Random variables with BBB inputs
+        global pttxtvar
+        global mttxtvar
+        global mptxtvar
+        global mrtxtvar
         pttxtvar = str(randint(1,20))
         mttxtvar = str(randint(1,20))
         mptxtvar = str(randint(1,20))
@@ -151,6 +171,19 @@ class GUI:
 
         #Allot Values of Checkbox variables to Outputs on BeagleBone to turn them on and off via relays.
         #Add fields for Frame 6. Suggest some.
+
+
+    def updategui(self):
+
+        print "Updates GUI"
+        global pttxtvar
+        global mttxtvar
+        global mptxtvar
+        global mrtxtvar
+        pttxtvar = str(randint(1,20))
+        mttxtvar = str(randint(1,20))
+        mptxtvar = str(randint(1,20))
+        mrtxtvar = str(randint(1,20))
 
     
 
