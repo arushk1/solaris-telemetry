@@ -1,6 +1,8 @@
 import sys
 from Tkinter import *
 import time
+import threading
+from multiprocessing import Process
 #import Adafruit_BBIO.GPIO as GPIO
 #import Adafruit_BBIO.ADC as ADC
 from random import randint
@@ -13,12 +15,13 @@ class GUI:
 
     def __init__(self,mgui):
         print "First Func"
-        self.creategui()
-        self.initpins()
+        self.createlabels()
+        self.createentry()
+        self.initpins
         while True:
-            self.updatepins()
             self.updategui()
-            time.sleep(1)
+            time.sleep(0.5)
+            
         #Define Sensor and output  pins
         #Call display after defining
         #Put in loop of delay 1 sec to update values
@@ -27,15 +30,17 @@ class GUI:
 
         print "Initialize pins"
 
-    def updatepins(self):
-
-        print "Update Pins"
-
-    def creategui(self):
+    def createlabels(self):
 
         print "Creates GUI"
             
         #Frame Information
+        global frame1
+        global frame2
+        global frame3
+        global frame4
+        global frame5
+        
         frame1 = Frame(mgui,bd=4,padx=2,pady=2,relief=GROOVE,width=200,height=125)
         frame2 = Frame(mgui,bd=4,padx=2,pady=2,relief=GROOVE,width=200,height=175)
         frame3 = Frame(mgui,bd=4,padx=2,pady=2,relief=GROOVE,width=200,height=125)
@@ -62,28 +67,7 @@ class GUI:
         mpptemp = Label(frame1,text="MPPT Temperature :").grid(row=2,column=0,sticky=W)
         motrrpm = Label(frame1,text="Motor RPM :").grid(row=3,column=0,sticky=W)
 
-        #Initialise values
-        #Using Random Values to test
-        #Replace Random variables with BBB inputs
-        global pttxtvar
-        global mttxtvar
-        global mptxtvar
-        global mrtxtvar
-        pttxtvar = str(randint(1,20))
-        mttxtvar = str(randint(1,20))
-        mptxtvar = str(randint(1,20))
-        mrtxtvar = str(randint(1,20))
-        pttxtvar = StringVar(value=pttxtvar)
-        mttxtvar = StringVar(value=mttxtvar)
-        mptxtvar = StringVar(value=mptxtvar)
-        mrtxtvar = StringVar(value=mrtxtvar)
-
-
-        #Frame1 Values
-        pttxt = Entry(frame1,bg="White",textvariable=pttxtvar).grid(row=0,column=1,sticky=W)
-        mttxt = Entry(frame1,bg="White",textvariable=mttxtvar).grid(row=1,column=1,sticky=W)
-        mptxt = Entry(frame1,bg="White",textvariable=mptxtvar).grid(row=2,column=1,sticky=W)
-        mrtxt = Entry(frame1,bg="White",textvariable=mrtxtvar).grid(row=3,column=1,sticky=W)
+        
 
 
         #Frame2 Labels
@@ -95,6 +79,45 @@ class GUI:
         motp = Label(frame2,text="Motor Power :").grid(row=4,column=0,sticky=W)
         batp = Label(frame2,text="Battery Power :").grid(row=5,column=0,sticky=W)
         auxp = Label(frame2,text="Aux Power :").grid(row=6,column=0,sticky=W)
+
+        
+        #Frame 3 - Speedometer, to be done later
+
+        #Frame 4 - Strategy
+
+        chglft = Label(frame4,text="Charge Left :").grid(row=0,column=0,sticky=W)
+        dstleft = Label(frame4,text="Distance Left :").grid(row=1,column=0,sticky=W)
+        dsttrv = Label(frame4,text="Dist Travelled :").grid(row=2,column=0,sticky=W)
+
+        #Sensor Pins
+        #Allot values of sensor pins to different variables and display thier data in the GUI    
+        #pantemppin = "P9_40"
+        #ADC.setup()
+        #pttxtvar = ((ADC.read(pantemppin)*1800)-500)/10
+
+
+        
+
+    def createentry(self):
+
+        
+        #Initialise values
+        #Using Random Values to test
+        #Replace Random variables with BBB inputs
+        pttxtvar = str(randint(1,20))
+        mttxtvar = str(randint(1,20))
+        mptxtvar = str(randint(1,20))
+        mrtxtvar = str(randint(1,20))
+        pttxtvar = StringVar(value=pttxtvar)
+        mttxtvar = StringVar(value=mttxtvar)
+        mptxtvar = StringVar(value=mptxtvar)
+        mrtxtvar = StringVar(value=mrtxtvar)
+        #Frame1 Values
+        pttxt = Entry(frame1,bg="White",textvariable=pttxtvar).grid(row=0,column=1,sticky=W)
+        mttxt = Entry(frame1,bg="White",textvariable=mttxtvar).grid(row=1,column=1,sticky=W)
+        mptxt = Entry(frame1,bg="White",textvariable=mptxtvar).grid(row=2,column=1,sticky=W)
+        mrtxt = Entry(frame1,bg="White",textvariable=mrtxtvar).grid(row=3,column=1,sticky=W)
+
 
         #Initialise Values
 
@@ -123,14 +146,6 @@ class GUI:
         bptxt = Entry(frame2,bg="White",textvariable=bptxtvar).grid(row=5,column=1)
         aptxt = Entry(frame2,bg="White",textvariable=aptxtvar).grid(row=6,column=1)
 
-        #Frame 3 - Speedometer, to be done later
-
-        #Frame 4 - Strategy
-
-        chglft = Label(frame4,text="Charge Left :").grid(row=0,column=0,sticky=W)
-        dstleft = Label(frame4,text="Distance Left :").grid(row=1,column=0,sticky=W)
-        dsttrv = Label(frame4,text="Dist Travelled :").grid(row=2,column=0,sticky=W)
-
         #Initialise Values
 
         clsns = ""
@@ -151,7 +166,36 @@ class GUI:
         #pantemppin = "P9_40"
         #ADC.setup()
         #pttxtvar = ((ADC.read(pantemppin)*1800)-500)/10
+        
 
+
+    def updategui(self):
+
+        print "Update GUI"
+        pttxtvar = str(randint(1,20))
+        mttxtvar = str(randint(1,20))
+        mptxtvar = str(randint(1,20))
+        mrtxtvar = str(randint(1,20))
+        pttxtvar = StringVar(value=pttxtvar)
+        mttxtvar = StringVar(value=mttxtvar)
+        mptxtvar = StringVar(value=mptxtvar)
+        mrtxtvar = StringVar(value=mrtxtvar)
+        pttxt = Entry(frame1,bg="White",textvariable=pttxtvar).grid(row=0,column=1,sticky=W)
+        mttxt = Entry(frame1,bg="White",textvariable=mttxtvar).grid(row=1,column=1,sticky=W)
+        mptxt = Entry(frame1,bg="White",textvariable=mptxtvar).grid(row=2,column=1,sticky=W)
+        mrtxt = Entry(frame1,bg="White",textvariable=mrtxtvar).grid(row=3,column=1,sticky=W)
+
+
+
+class toggles:
+
+    def __init__(self,mgui):
+        
+        frame5 = Frame(mgui,bd=4,padx=2,pady=2,relief=GROOVE,width=200,height=125)
+        frame5.grid_propagate(0)
+        frame5.grid(row=0,column=2)
+
+        
         #Frame 5 Labels
 
         auxfan = Label(frame5,text="Aux Fan :").grid(row=0,column=0,stick=W)
@@ -168,22 +212,11 @@ class GUI:
         mpptcheck = Checkbutton(frame5, text="Toggle", variable=mpptvar).grid(row=1,column=1)
         pancheck = Checkbutton(frame5, text="Toggle", variable=panvar).grid(row=2,column=1)
         drivercheck = Checkbutton(frame5, text="Toggle", variable=drivervar).grid(row=3,column=1)
-
+        
         #Allot Values of Checkbox variables to Outputs on BeagleBone to turn them on and off via relays.
         #Add fields for Frame 6. Suggest some.
 
-
-    def updategui(self):
-
-        print "Updates GUI"
-        global pttxtvar
-        global mttxtvar
-        global mptxtvar
-        global mrtxtvar
-        pttxtvar = str(randint(1,20))
-        mttxtvar = str(randint(1,20))
-        mptxtvar = str(randint(1,20))
-        mrtxtvar = str(randint(1,20))
+        
 
     
 
