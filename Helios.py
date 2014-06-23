@@ -13,14 +13,14 @@ mgui.title("Helios Suite")
     
 class GUI:
 
-    def __init__(self,mgui):
+    def __init__(self,mgui):        
+        self.mgui = mgui
         print "First Func"
         self.createlabels()
         self.createentry()
-        self.initpins
-        while True:
-            self.updategui()
-            time.sleep(0.5)
+        self.initpins()
+        self.updategui()
+        time.sleep(0.5)
             
         #Define Sensor and output  pins
         #Call display after defining
@@ -171,6 +171,8 @@ class GUI:
 
     def updategui(self):
 
+        global mgui
+
         print "Update GUI"
         pttxtvar = str(randint(1,20))
         mttxtvar = str(randint(1,20))
@@ -184,7 +186,7 @@ class GUI:
         mttxt = Entry(frame1,bg="White",textvariable=mttxtvar).grid(row=1,column=1,sticky=W)
         mptxt = Entry(frame1,bg="White",textvariable=mptxtvar).grid(row=2,column=1,sticky=W)
         mrtxt = Entry(frame1,bg="White",textvariable=mrtxtvar).grid(row=3,column=1,sticky=W)
-
+        self.mgui.after(500, self.updategui)
 
 
 class toggles:
@@ -220,7 +222,5 @@ class toggles:
 
     
 
-
-if __name__ == "__main__":
-    app = GUI(mgui)
-    mgui.mainloop()
+app = GUI(mgui)
+mgui.mainloop()
