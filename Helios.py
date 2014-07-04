@@ -3,7 +3,7 @@
 import sys
 from Tkinter import *
 import time, os
-import Rpi.GPIO as GPIO
+import RPi.GPIO as GPIO
 from random import randint
 
 mgui = Tk()
