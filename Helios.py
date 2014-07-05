@@ -2,11 +2,8 @@
 
 import sys
 from Tkinter import *
-import time
-import threading
-from multiprocessing import Process
-#import Adafruit_BBIO.GPIO as GPIO
-#import Adafruit_BBIO.ADC as ADC
+import time, os
+import Rpi.GPIO as GPIO
 from random import randint
 
 mgui = Tk()
@@ -18,9 +15,9 @@ class GUI:
     def __init__(self,mgui):        
         self.mgui = mgui
         print "First Func"
+        self.initpins()
         self.createlabels()
         self.createentry()
-        self.initpins()
         self.updategui()
         time.sleep(0.5)
             
@@ -31,6 +28,19 @@ class GUI:
     def initpins(self):
 
         print "Initialize pins"
+
+        DEBUG = 1
+        GPIO.setmode(GPIO.BCM)
+
+        SPICLK = 18
+        SPIMOSI = 24
+        SPIMISO = 23
+        SPICS = 25
+
+        GPIO.setup(SPIMOSI, GPIO.OUT)
+        GPIO.setup(SPIMISO, GPIO.IN)
+        GPIO.setup(SPICLK, GPIO.OUT)
+        GPIO.setup(SPICS, GPIO.OUT)
 
     def createlabels(self):
 
@@ -90,12 +100,6 @@ class GUI:
         chglft = Label(frame4,text="Charge Left :").grid(row=0,column=0,sticky=W)
         dstleft = Label(frame4,text="Distance Left :").grid(row=1,column=0,sticky=W)
         dsttrv = Label(frame4,text="Dist Travelled :").grid(row=2,column=0,sticky=W)
-
-        #Sensor Pins
-        #Allot values of sensor pins to different variables and display thier data in the GUI    
-        #pantemppin = "P9_40"
-        #ADC.setup()
-        #pttxtvar = ((ADC.read(pantemppin)*1800)-500)/10
 
 
         
@@ -162,12 +166,6 @@ class GUI:
         cltxt = Entry(frame4,bg="White",textvariable=clvar).grid(row=0,column=1,sticky=W)
         dltxt = Entry(frame4,bg="White",textvariable=dlvar).grid(row=1,column=1,sticky=W)
         dttxt = Entry(frame4,bg="White",textvariable=dtvar).grid(row=2,column=1,sticky=W)
-
-        #Sensor Pins
-        #Allot values of sensor pins to different variables and display thier data in the GUI    
-        #pantemppin = "P9_40"
-        #ADC.setup()
-        #pttxtvar = ((ADC.read(pantemppin)*1800)-500)/10
         
 
 
@@ -176,10 +174,14 @@ class GUI:
         global mgui
 
         print "Update GUI"
-        pttxtvar = str(randint(1,20))
-        mttxtvar = str(randint(1,20))
-        mptxtvar = str(randint(1,20))
-        mrtxtvar = str(randint(1,20))
+        #pttxtvar = str(randint(1,20))
+        #mttxtvar = str(randint(1,20))
+        #mptxtvar = str(randint(1,20))
+        #mrtxtvar = str(randint(1,20))
+        pttxtvar = readadc(0, SPICLK, SPIMOSI, SPIMISO, SPICS)
+        mttxtvar = readadc(1, SPICLK, SPIMOSI, SPIMISO, SPICS)
+        mptxtvar = readadc(2, SPICLK, SPIMOSI, SPIMISO, SPICS)
+        mrtxtvar = readadc(3, SPICLK, SPIMOSI, SPIMISO, SPICS)
         pttxtvar = StringVar(value=pttxtvar)
         mttxtvar = StringVar(value=mttxtvar)
         mptxtvar = StringVar(value=mptxtvar)
@@ -191,34 +193,40 @@ class GUI:
         self.mgui.after(500, self.updategui)
 
 
-class toggles:
+def readadc(adcnum, clockpin, mosipin, misopin, cspin):
+	if ((adcnum > 7) or (adcnum < 0)):
+		return -1
+	GPIO.output(cspin, True)
 
-    def __init__(self,mgui):
-        
-        frame5 = Frame(mgui,bd=4,padx=2,pady=2,relief=GROOVE,width=200,height=125)
-        frame5.grid_propagate(0)
-        frame5.grid(row=0,column=2)
+	GPIO.output(clockpin, False)  # start clock low
+	GPIO.output(cspin, False)     # bring CS low
 
-        
-        #Frame 5 Labels
+	commandout = adcnum
+	commandout |= 0x18  # start bit + single-ended bit
+	commandout <<= 3    # we only need to send 5 bits here
+	for i in range(5):
+		if (commandout & 0x80):
+			GPIO.output(mosipin, True)
+		else:
+   			GPIO.output(mosipin, False)
+                commandout <<= 1
+                GPIO.output(clockpin, True)
+                GPIO.output(clockpin, False)
 
-        auxfan = Label(frame5,text="Aux Fan :").grid(row=0,column=0,stick=W)
-        mpptfan = Label(frame5,text="MPPT Fan :").grid(row=1,column=0,stick=W)
-        pancool = Label(frame5,text="Panel Cooling :").grid(row=2,column=0,stick=W)
-        driverfan = Label(frame5,text="Driver Fan :").grid(row=3,column=0,stick=W)
+	adcout = 0
+	# read in one empty bit, one null bit and 10 ADC bits
+	for i in range(12):
+		GPIO.output(clockpin, True)
+		GPIO.output(clockpin, False)
+		adcout <<= 1
+		if (GPIO.input(misopin)):
+			adcout |= 0x1
 
-        #Frame 5 Check boxes
-        auxvar = IntVar()
-        mpptvar = IntVar()
-        panvar = IntVar()
-        drivervar = IntVar()
-        auxcheck = Checkbutton(frame5, text="Toggle", variable=auxvar).grid(row=0,column=1)
-        mpptcheck = Checkbutton(frame5, text="Toggle", variable=mpptvar).grid(row=1,column=1)
-        pancheck = Checkbutton(frame5, text="Toggle", variable=panvar).grid(row=2,column=1)
-        drivercheck = Checkbutton(frame5, text="Toggle", variable=drivervar).grid(row=3,column=1)
-        
-        #Allot Values of Checkbox variables to Outputs on BeagleBone to turn them on and off via relays.
-        #Add fields for Frame 6. Suggest some.
+	GPIO.output(cspin, True)
+
+	adcout /= 2       # first bit is 'null' so drop it
+	return adcout
+
 
         
 
