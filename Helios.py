@@ -179,10 +179,10 @@ class GUI:
         #mttxtvar = str(randint(1,20))
         #mptxtvar = str(randint(1,20))
         #mrtxtvar = str(randint(1,20))
-        pttxtvar = (readadc(0, SPICLK, SPIMOSI, SPIMISO, SPICS)/1023)*33
-        mttxtvar = (readadc(1, SPICLK, SPIMOSI, SPIMISO, SPICS)/1023)*33
-        mptxtvar = (readadc(2, SPICLK, SPIMOSI, SPIMISO, SPICS)/1023)*33
-        mrtxtvar = (readadc(3, SPICLK, SPIMOSI, SPIMISO, SPICS)/1023)*33
+        pttxtvar = (readadc(0, SPICLK, SPIMOSI, SPIMISO, SPICS)/1023.0)*33
+        mttxtvar = (readadc(1, SPICLK, SPIMOSI, SPIMISO, SPICS)/1023.0)*33
+        mptxtvar = (readadc(2, SPICLK, SPIMOSI, SPIMISO, SPICS)/1023.0)*33
+        mrtxtvar = (readadc(3, SPICLK, SPIMOSI, SPIMISO, SPICS)/1023.0)*33
         pttxtvar = StringVar(value=pttxtvar)
         mttxtvar = StringVar(value=mttxtvar)
         mptxtvar = StringVar(value=mptxtvar)
