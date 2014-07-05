@@ -3,13 +3,22 @@
 import sys
 from Tkinter import *
 import time, os
-import Rpi.GPIO as GPIO
+import RPi.GPIO as GPIO
 from random import randint
 
 mgui = Tk()
 mgui.geometry("600x300")
 mgui.title("Helios Suite")
-    
+
+
+DEBUG = 1
+GPIO.setmode(GPIO.BCM)
+SPICLK = 18
+SPIMOSI = 24
+SPIMISO = 23
+SPICS = 25
+        
+
 class GUI:
 
     def __init__(self,mgui):        
@@ -28,14 +37,6 @@ class GUI:
     def initpins(self):
 
         print "Initialize pins"
-
-        DEBUG = 1
-        GPIO.setmode(GPIO.BCM)
-
-        SPICLK = 18
-        SPIMOSI = 24
-        SPIMISO = 23
-        SPICS = 25
 
         GPIO.setup(SPIMOSI, GPIO.OUT)
         GPIO.setup(SPIMISO, GPIO.IN)
