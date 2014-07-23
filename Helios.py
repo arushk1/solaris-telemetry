@@ -194,8 +194,6 @@ class GUI:
     def updategui(self):
 
         global mgui
-        global gpsd
-        global gpsp
 
         #Frame 1
 
@@ -212,24 +210,8 @@ class GUI:
         mttxt = Entry(frame1,bg="White",textvariable=mttxtvar).grid(row=1,column=1,sticky=W)
         mptxt = Entry(frame1,bg="White",textvariable=mptxtvar).grid(row=2,column=1,sticky=W)
         mrtxt = Entry(frame1,bg="White",textvariable=mrtxtvar).grid(row=3,column=1,sticky=W)
-
-        #Initialise Frame3 Values
-
-        speedtxt = gpsd.fix.speed
-        lattxt = gpsd.fix.latitude
-        longtxt = gpsd.fix.longitude
-        speedtxtvar = StringVar(value=speedtxt)
-        lattxtvar = StringVar(value=lattxt)
-        longtxtvar = StringVar(value=longtxt)
-        
-        #Frame3 Values
-        
-        speedtext = Entry(frame3,bg="White",textvariable=speedtxtvar).grid(row=0,column=1)
-        lattext = Entry(frame3,bg="White",textvariable=lattxtvar).grid(row=1,column=1)
-        longtext = Entry(frame3,bg="White",textvariable=longtxtvar).grid(row=2,column=1)
-
-
-
+        print gpsc.fix.latitude
+        print gpsc.fix.longitude
 
 
 
@@ -297,5 +279,5 @@ def readadc(adcnum, clockpin, mosipin, misopin, cspin):
 
 app = GUI(mgui)
 mgui.mainloop()
-gpsp = GpsPoller()
-gpsp.start()
+gpsc = GpsPoller()
+gpsc.start()
