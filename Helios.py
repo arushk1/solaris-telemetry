@@ -6,7 +6,6 @@ import time, os
 import RPi.GPIO as GPIO
 from random import randint
 from gps import *
-from time import *
 import threading
 
 mgui = Tk()
