@@ -293,11 +293,10 @@ def readadc(adcnum, clockpin, mosipin, misopin, cspin):
         
 
     
-
-app = GUI(mgui)
-mgui.mainloop()
 #create controller
 gpsc = GpsController()
 
 #start controller
 gpsc.start()
+app = GUI(mgui)
+mgui.mainloop()
