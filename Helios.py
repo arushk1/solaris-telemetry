@@ -99,8 +99,8 @@ class GUI:
         #Frame 3 - Speedometer, to be done later
 
         speed = Label(frame3, text="Speed :").grid(row=0,column=0,sticky=W)
-        lat = Label(frame3, text="Latitude :" font=("Helvetica", 16)).grid(row=0,column=0,sticky=W)
-        longitude = Label(frame3, text="Longitude :" font=("Helvetica", 16)).grid(row=0,column=0,sticky=W)
+        lat = Label(frame3, text="Latitude :").grid(row=0,column=0,sticky=W)
+        longitude = Label(frame3, text="Longitude :").grid(row=0,column=0,sticky=W)
 
         #Frame 4 - Strategy
 
