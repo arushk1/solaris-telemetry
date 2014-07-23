@@ -5,12 +5,15 @@ from Tkinter import *
 import time, os
 import RPi.GPIO as GPIO
 from random import randint
+from gps import *
+from time import *
+import threading
 
 mgui = Tk()
 mgui.geometry("600x300")
 mgui.title("Helios Suite")
 
-
+gpsd = None #seting the global variable
 DEBUG = 1
 GPIO.setmode(GPIO.BCM)
 SPICLK = 18
@@ -78,23 +81,26 @@ class GUI:
         pantemp = Label(frame1,text="Panel Temperature :").grid(row=0,column=0,sticky=W)
         mottemp = Label(frame1,text="Motor Temperature :").grid(row=1,column=0,sticky=W)
         mpptemp = Label(frame1,text="MPPT Temperature :").grid(row=2,column=0,sticky=W)
-        motrrpm = Label(frame1,text="Motor RPM :").grid(row=3,column=0,sticky=W)
+        motrrpm = Label(frame1,text="Cabin Temperature :").grid(row=3,column=0,sticky=W)
 
         
 
 
         #Frame2 Labels
 
-        panc = Label(frame2,text="Panel Current :").grid(row=0,column=0,sticky=W)
+        panc = Label(frame2,text="Aux Current :").grid(row=0,column=0,sticky=W)
         motc = Label(frame2,text="Motor Current :").grid(row=1,column=0,sticky=W)
         batc = Label(frame2,text="Battery Current :").grid(row=2,column=0,sticky=W)
-        panp = Label(frame2,text="Panel Power :").grid(row=3,column=0,sticky=W)
-        motp = Label(frame2,text="Motor Power :").grid(row=4,column=0,sticky=W)
-        batp = Label(frame2,text="Battery Power :").grid(row=5,column=0,sticky=W)
-        auxp = Label(frame2,text="Aux Power :").grid(row=6,column=0,sticky=W)
+        panp = Label(frame2,text="MPPT 1 :").grid(row=3,column=0,sticky=W)
+        motp = Label(frame2,text="MPPT 2 :").grid(row=4,column=0,sticky=W)
+        batp = Label(frame2,text="MPPT 3 :").grid(row=5,column=0,sticky=W)
 
         
         #Frame 3 - Speedometer, to be done later
+
+        speed = Label(frame3, text="Speed :" font=("Helvetica", 16)).grid(row=0,column=0,sticky=W)
+        lat = Label(frame3, text="Latitude :" font=("Helvetica", 16)).grid(row=0,column=0,sticky=W)
+        longitude = Label(frame3, text="Longitude :" font=("Helvetica", 16)).grid(row=0,column=0,sticky=W)
 
         #Frame 4 - Strategy
 
@@ -162,6 +168,21 @@ class GUI:
         dlvar = StringVar(value=dlsns)
         dtvar = StringVar(value=dtsns)
 
+        #Initialise Frame3 Values
+
+        speedtxt = ""
+        lattxt = ""
+        longtxt = ""
+        speedtxtvar = StringVar(value=speedtxt)
+        lattxtvar = StringVar(value=lattxt)
+        longtxtvar = StringVar(value=longtxt)
+        
+        #Frame3 Values
+        
+        speedtext = Entry(frame3,bg="White",textvariable=speedtxtvar).grid(row=0,column=1)
+        lattext = Entry(frame3,bg="White",textvariable=lattxtvar).grid(row=1,column=1)
+        longtext = Entry(frame3,bg="White",textvariable=longtxtvar).grid(row=2,column=1)
+        
         #Frame4 Values
 
         cltxt = Entry(frame4,bg="White",textvariable=clvar).grid(row=0,column=1,sticky=W)
@@ -174,11 +195,9 @@ class GUI:
 
         global mgui
 
+        #Frame 1
+
         print "Update GUI"
-        #pttxtvar = str(randint(1,20))
-        #mttxtvar = str(randint(1,20))
-        #mptxtvar = str(randint(1,20))
-        #mrtxtvar = str(randint(1,20))
         pttxtvar = (readadc(0, SPICLK, SPIMOSI, SPIMISO, SPICS)/1023.0)*33
         mttxtvar = (readadc(1, SPICLK, SPIMOSI, SPIMISO, SPICS)/1023.0)*33
         mptxtvar = (readadc(2, SPICLK, SPIMOSI, SPIMISO, SPICS)/1023.0)*33
@@ -191,7 +210,48 @@ class GUI:
         mttxt = Entry(frame1,bg="White",textvariable=mttxtvar).grid(row=1,column=1,sticky=W)
         mptxt = Entry(frame1,bg="White",textvariable=mptxtvar).grid(row=2,column=1,sticky=W)
         mrtxt = Entry(frame1,bg="White",textvariable=mrtxtvar).grid(row=3,column=1,sticky=W)
+
+        #Initialise Frame3 Values
+
+        speedtxt = gpsd.fix.speed
+        lattxt = gpsd.fix.latitude
+        longtxt = gpsd.fix.longitude
+        speedtxtvar = StringVar(value=speedtxt)
+        lattxtvar = StringVar(value=lattxt)
+        longtxtvar = StringVar(value=longtxt)
+        
+        #Frame3 Values
+        
+        speedtext = Entry(frame3,bg="White",textvariable=speedtxtvar).grid(row=0,column=1)
+        lattext = Entry(frame3,bg="White",textvariable=lattxtvar).grid(row=1,column=1)
+        longtext = Entry(frame3,bg="White",textvariable=longtxtvar).grid(row=2,column=1)
+
+
+
+
+
+
+
+
+
+
+
+        
         self.mgui.after(500, self.updategui)
+
+
+class GpsPoller(threading.Thread):
+  def __init__(self):
+    threading.Thread.__init__(self)
+    global gpsd #bring it in scope
+    gpsd = gps(mode=WATCH_ENABLE) #starting the stream of info
+    self.current_value = None
+    self.running = True #setting the thread running to true
+ 
+  def run(self):
+    global gpsd
+    while gpsp.running:
+      gpsd.next()
 
 
 def readadc(adcnum, clockpin, mosipin, misopin, cspin):
@@ -235,3 +295,5 @@ def readadc(adcnum, clockpin, mosipin, misopin, cspin):
 
 app = GUI(mgui)
 mgui.mainloop()
+gpsp = GpsPoller()
+gpsp.start()
