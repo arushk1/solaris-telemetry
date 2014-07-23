@@ -194,6 +194,8 @@ class GUI:
     def updategui(self):
 
         global mgui
+        global gpsd
+        global gpsp
 
         #Frame 1
 
