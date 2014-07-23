@@ -194,6 +194,7 @@ class GUI:
     def updategui(self):
 
         global mgui
+        global gpsc
 
         #Frame 1
 
