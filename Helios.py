@@ -194,7 +194,7 @@ class GUI:
     def updategui(self):
 
         global mgui
-        global gpsd
+        global gpsc
 
         #Frame 1
 
@@ -211,8 +211,8 @@ class GUI:
         mttxt = Entry(frame1,bg="White",textvariable=mttxtvar).grid(row=1,column=1,sticky=W)
         mptxt = Entry(frame1,bg="White",textvariable=mptxtvar).grid(row=2,column=1,sticky=W)
         mrtxt = Entry(frame1,bg="White",textvariable=mrtxtvar).grid(row=3,column=1,sticky=W)
-        print gpsd.fix.latitude
-        print gpsd.fix.longitude
+        print gpsc.fix.latitude
+        print gpsc.fix.longitude
 
 
 
@@ -225,18 +225,34 @@ class GUI:
         self.mgui.after(500, self.updategui)
 
 
-class GpsPoller(threading.Thread):
-  def __init__(self):
-    threading.Thread.__init__(self)
-    global gpsd #bring it in scope
-    gpsd = gps(mode=WATCH_ENABLE) #starting the stream of info
-    self.current_value = None
-    self.running = True #setting the thread running to true
+class GpsController(threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+        self.gpsd = gps(mode=WATCH_ENABLE) #starting the stream of info
+        self.running = False
+   
+    def run(self):
+        self.running = True
+        while self.running:
+            # grab EACH set of gpsd info to clear the buffer
+            self.gpsd.next()
+
+    def stopController(self):
+        self.running = False
  
-  def run(self):
-    global gpsd
-    while gpsp.running:
-      gpsd.next()
+    @property
+    def fix(self):
+        return self.gpsd.fix
+
+    @property
+    def utc(self):
+        return self.gpsd.utc
+
+    @property
+    def satellites(self):
+        return self.gpsd.satellites
+
+
 
 
 def readadc(adcnum, clockpin, mosipin, misopin, cspin):
@@ -280,5 +296,8 @@ def readadc(adcnum, clockpin, mosipin, misopin, cspin):
 
 app = GUI(mgui)
 mgui.mainloop()
-gpsc = GpsPoller()
+#create controller
+gpsc = GpsController()
+
+#start controller
 gpsc.start()
