@@ -194,7 +194,7 @@ class GUI:
     def updategui(self):
 
         global mgui
-        global gpsc
+        global gpsd
 
         #Frame 1
 
@@ -211,8 +211,8 @@ class GUI:
         mttxt = Entry(frame1,bg="White",textvariable=mttxtvar).grid(row=1,column=1,sticky=W)
         mptxt = Entry(frame1,bg="White",textvariable=mptxtvar).grid(row=2,column=1,sticky=W)
         mrtxt = Entry(frame1,bg="White",textvariable=mrtxtvar).grid(row=3,column=1,sticky=W)
-        print gpsc.fix.latitude
-        print gpsc.fix.longitude
+        print gpsd.fix.latitude
+        print gpsd.fix.longitude
 
 
 
