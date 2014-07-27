@@ -7,6 +7,8 @@ import RPi.GPIO as GPIO
 from random import randint
 from gps import *
 import threading
+import numpy as np
+import cv2
 
 mgui = Tk()
 mgui.geometry("600x300")
@@ -103,9 +105,9 @@ class GUI:
 
         #Frame 4 - Strategy
 
-        chglft = Label(frame4,text="Charge Left :").grid(row=0,column=0,sticky=W)
-        dstleft = Label(frame4,text="Distance Left :").grid(row=1,column=0,sticky=W)
-        dsttrv = Label(frame4,text="Dist Travelled :").grid(row=2,column=0,sticky=W)
+        chglft = Label(frame5,text="Charge Left :").grid(row=0,column=0,sticky=W)
+        dstleft = Label(frame5,text="Distance Left :").grid(row=1,column=0,sticky=W)
+        dsttrv = Label(frame5,text="Dist Travelled :").grid(row=2,column=0,sticky=W)
 
 
         
@@ -182,11 +184,11 @@ class GUI:
         lattext = Entry(frame3,bg="White",textvariable=lattxtvar).grid(row=1,column=1)
         longtext = Entry(frame3,bg="White",textvariable=longtxtvar).grid(row=2,column=1)
         
-        #Frame4 Values
+        #Frame 5 Values
 
-        cltxt = Entry(frame4,bg="White",textvariable=clvar).grid(row=0,column=1,sticky=W)
-        dltxt = Entry(frame4,bg="White",textvariable=dlvar).grid(row=1,column=1,sticky=W)
-        dttxt = Entry(frame4,bg="White",textvariable=dtvar).grid(row=2,column=1,sticky=W)
+        cltxt = Entry(frame5,bg="White",textvariable=clvar).grid(row=0,column=1,sticky=W)
+        dltxt = Entry(frame5,bg="White",textvariable=dlvar).grid(row=1,column=1,sticky=W)
+        dttxt = Entry(frame5,bg="White",textvariable=dtvar).grid(row=2,column=1,sticky=W)
         
 
 
@@ -210,10 +212,18 @@ class GUI:
         mttxt = Entry(frame1,bg="White",textvariable=mttxtvar).grid(row=1,column=1,sticky=W)
         mptxt = Entry(frame1,bg="White",textvariable=mptxtvar).grid(row=2,column=1,sticky=W)
         mrtxt = Entry(frame1,bg="White",textvariable=mrtxtvar).grid(row=3,column=1,sticky=W)
-        print gpsc.fix.latitude
-        print gpsc.fix.longitude
 
+        #Frame 3
 
+        speedtxt = gpsc.fix.speed
+        lattxt = gpsc.fix.latitude
+        longtxt = gpsc.fix.longitude
+        speedtxtvar = StringVar(value=speedtxt)
+        lattxtvar = StringVar(value=lattxt)
+        longtxtvar = StringVar(value=longtxt)
+        speedtext = Entry(frame3,bg="White",textvariable=speedtxtvar).grid(row=0,column=1)
+        lattext = Entry(frame3,bg="White",textvariable=lattxtvar).grid(row=1,column=1)
+        longtext = Entry(frame3,bg="White",textvariable=longtxtvar).grid(row=2,column=1)
 
 
 
